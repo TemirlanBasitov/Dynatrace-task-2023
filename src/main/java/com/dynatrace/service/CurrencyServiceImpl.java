@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-
 @Service
 public class CurrencyServiceImpl implements CurrencyService{
 
