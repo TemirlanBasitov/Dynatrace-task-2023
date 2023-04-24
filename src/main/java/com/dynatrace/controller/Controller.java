@@ -3,6 +3,7 @@ package com.dynatrace.controller;
 import com.dynatrace.entity.Currency;
 import com.dynatrace.entity.Rate;
 import com.dynatrace.service.CurrencyService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class Controller {
         this.currencyService = currencyService;
     }
     @GetMapping("/a/{code}/{date}")
-    public ResponseEntity<Float> getAvgRateByCodeAndDate(@PathVariable String code, @PathVariable LocalDate date){
+    public ResponseEntity<Float> getAvgRateByCodeAndDate(@PathVariable String code, @PathVariable  LocalDate date){
         Float response = currencyService.getAvgRateByCodeAndDate(code, date);
         return new ResponseEntity<Float>(response, HttpStatus.OK);
     }
