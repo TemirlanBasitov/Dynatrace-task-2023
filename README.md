@@ -18,6 +18,11 @@ Below on the schema you can see all methods and endpoints with exampels.
 -{code} is code of currency in international format;
 -{number} is number of quataion das. For example ../GBP/last/3 means getting GBP currency rates fro last 3 working days
 ![Снимок экрана (4)](https://user-images.githubusercontent.com/57500808/234335055-98a45912-3457-4b32-81f0-3c3faba778c1.png)
-
+***
+## 4. Error handling
+Applcation checks correctness of path, currency code, date, table and number of quotations. Below on the table you can see incorrect input and error messages.
+It checks date provided, its format, also check if it is weekend day or future day.
+On the next two methods it checks quotation number, it expects 0<N<256 integer number.
+![Снимок экрана (5)](https://user-images.githubusercontent.com/57500808/234339932-686e04e8-aa6d-4800-8678-32d016ff7ffa.png)
 
 
