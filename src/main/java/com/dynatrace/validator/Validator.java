@@ -23,4 +23,12 @@ public class Validator {
             return false;
         }
     }
+    public static  boolean isValidQuotation(int number){
+        if(number > 0 && number < 256){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }

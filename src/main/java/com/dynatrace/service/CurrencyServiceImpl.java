@@ -5,12 +5,9 @@ import com.dynatrace.entity.Rate;
 import com.dynatrace.exception.*;
 import com.dynatrace.validator.Validator;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.WebRequest;
-
 import java.time.LocalDate;
-import java.util.Date;
+
 
 @Service
 public class CurrencyServiceImpl implements CurrencyService{
@@ -20,10 +17,10 @@ public class CurrencyServiceImpl implements CurrencyService{
     @Override
     public Float getAvgRateByCodeAndDate(String code, LocalDate date) {
         if(Validator.isFuture(date)){
-            throw new FutureDayException("Given date range is incorrect");
+            throw new FutureDayException("Given date range is future date");
         }
         if (Validator.isHoliday(date)){
-            throw new WeekendException("You have chosen holiday");
+            throw new WeekendException("You have chosen weekend day");
         }
         else {
             String dateStr = date + "";
@@ -39,7 +36,7 @@ public class CurrencyServiceImpl implements CurrencyService{
     @Override
     public String getMaxAndMinAvgQuotation(String code, Integer number) {
 
-        if(number > 0 && number <=255){
+        if(Validator.isValidQuotation(number)){
             String endpoint = String.format("/a/%s/last/%s/?format=json", code, number);
             String apiUrl = String.format("%s%s", baseUrl, endpoint);
             RestTemplate rest = new RestTemplate();
@@ -56,31 +53,37 @@ public class CurrencyServiceImpl implements CurrencyService{
                     maxRate = rate;
                 }
             }
-            return "Maximum rate average was on: " +  maxRate.getEffectiveDate() + ", value is: " + maxRate.getMid() + "\n"
-                    + "Minimum was on: " + minRate.getEffectiveDate() + ", value is: " + minRate.getMid();
+            return "Maximum rate average date: " +  maxRate.getEffectiveDate() + ", value is: " + maxRate.getMid() + "\n"
+                    + "Minimum rate average date: " + minRate.getEffectiveDate() + ", value is: " + minRate.getMid() + "\n" +
+                    "for last " + number + " quotations on " + response.getCode();
         }
         else{
-            throw new OutOfRangeQuotation("Given number of quotation should be between 1 and 255 inclusively");
+            throw new OutOfRangeQuotation("Invalid number of quotations, choose 1 and 255 inclusively");
         }
 
     }
 
     @Override
     public String getMajorDifference(String code, Integer number) {
-        String endpoint = String.format("/c/%s/last/%s/?format=json", code, number);
-        String apiUrl = String.format("%s%s", baseUrl, endpoint);
-        RestTemplate rest = new RestTemplate();
-        Currency response = rest.getForObject(apiUrl, Currency.class);
-        Rate maxDifferenceRate = new Rate();
-        Float difference = response.getRates()[0].getAsk() - response.getRates()[0].getBid();
-        for(Rate rate : response.getRates()){
-            Float currentDifference = rate.getAsk() - rate.getBid();
-            if(Float.compare(currentDifference, difference) == 0 || Float.compare(currentDifference, difference)==1 ){
-                maxDifferenceRate = rate;
-                difference = currentDifference;
+            if(Validator.isValidQuotation(number)){
+                String endpoint = String.format("/c/%s/last/%s/?format=json", code, number);
+                String apiUrl = String.format("%s%s", baseUrl, endpoint);
+                RestTemplate rest = new RestTemplate();
+                Currency response = rest.getForObject(apiUrl, Currency.class);
+                Rate maxDifferenceRate = new Rate();
+                Float difference = response.getRates()[0].getAsk() - response.getRates()[0].getBid();
+                for(Rate rate : response.getRates()){
+                    Float currentDifference = rate.getAsk() - rate.getBid();
+                    if(Float.compare(currentDifference, difference) == 0 || Float.compare(currentDifference, difference)==1 ){
+                        maxDifferenceRate = rate;
+                        difference = currentDifference;
+                    }
+                }
+                return "Major difference between the buy and sell rate for last  " + number +  " quotations  was on: " + maxDifferenceRate.getEffectiveDate()
+                        + ", value is: " + difference + " code is: " + response.getCode();
             }
-        }
-        return "Major difference between the buy and sell rate was on: " + maxDifferenceRate.getEffectiveDate()
-                + ", value is: " + difference ;
+            else {
+                throw new OutOfRangeQuotation("Invalid number of quotations, choose 1 and 255 inclusively");
+            }
     }
 }
