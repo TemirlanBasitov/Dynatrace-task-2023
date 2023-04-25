@@ -24,5 +24,13 @@ Applcation checks correctness of path, currency code, date, table and number of 
 It checks date provided, its format, also check if it is weekend day or future day.
 On the next two methods it checks quotation number, it expects 0<N<256 integer number.
 ![Снимок экрана (5)](https://user-images.githubusercontent.com/57500808/234339932-686e04e8-aa6d-4800-8678-32d016ff7ffa.png)
+## 5. Query examples
+1. Get average max and min rates of GBP for last 30 days
+http://localhost:8080/api/exchange/a/gbp/last/30
 
+2. Get average rate of CZK for 21 April 2023.
+http://localhost:8080/api/exchange/a/gbp/2023-04-21
+
+3. Get major difference in selling and buying prices of AUD for last 2 weeks
+http://localhost:8080/api/exchange/c/AUD/last/14
 
